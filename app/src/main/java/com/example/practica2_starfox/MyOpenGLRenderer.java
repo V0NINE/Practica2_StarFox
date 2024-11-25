@@ -11,10 +11,19 @@ import org.w3c.dom.Text;
 
 public class MyOpenGLRenderer implements Renderer {
 
+	private static final int WIDE_RATIO = 5;
+	private static final int HEIGHT_RATIO = 4;
+
 	private final Context context;
 
 	private TextureCube hud_lives;
 	private TextureCube hud_shield;
+
+	float lives_x_scale;
+	float lives_y_scale;
+
+	float shield_x_scale;
+	float shield_y_scale;
 
 	private int width;
 	private int height;
@@ -35,10 +44,6 @@ public class MyOpenGLRenderer implements Renderer {
 		// Image Background color
 		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
-		gl.glEnable(gl.GL_BLEND);
-		gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
-
-
 		hud_lives = new TextureCube();
 		hud_shield = new TextureCube();
 
@@ -46,38 +51,22 @@ public class MyOpenGLRenderer implements Renderer {
 		hud_shield.loadTexture(gl, context, R.raw.hud_shield);
 	}
 
-	//float x_scale = (float)(1.2 * (1080 / (float)getWidth()));
-
-	float lives_x_scale;
-	float lives_y_scale;
-
-	float shield_x_scale;
-	float shield_y_scale;
-
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 		setOrthographicProjection(gl);
 
-		lives_x_scale = (float)(1.2 * (1080 / (float)getWidth()));
-		lives_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
-
-		shield_x_scale = (float)(1.7 * (1080 / (float)getWidth()));
-		shield_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
-
-		//System.out.println("H " + getHeight() + "W " + getWidth());
-
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_lives.getTextureID());
-		gl.glTranslatef((lives_x_scale - 10/2),-(lives_y_scale -8/2),0);
+		gl.glTranslatef((lives_x_scale - WIDE_RATIO),-(lives_y_scale - HEIGHT_RATIO),0);
 		gl.glScalef(lives_x_scale, lives_y_scale, 0);
 		hud_lives.draw(gl);
 		gl.glPopMatrix();
 
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_shield.getTextureID());
-		gl.glTranslatef((shield_x_scale - 10/2),(shield_y_scale -8/2),0);
+		gl.glTranslatef((shield_x_scale - WIDE_RATIO) + 0.04f,(shield_y_scale - HEIGHT_RATIO) + 0.06f,0);
 		gl.glScalef(shield_x_scale, shield_y_scale, 0);
 		hud_shield.draw(gl);
 		gl.glPopMatrix();
@@ -109,6 +98,9 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glDepthMask(false);  // disable writes to Z-Buffer
 		gl.glDisable(GL10.GL_DEPTH_TEST);  // disable depth-testing
 
+		gl.glEnable(GL10.GL_BLEND);  // enables image transparency
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);  // Indicates the color on alpha channel
+
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
 	}
@@ -118,6 +110,12 @@ public class MyOpenGLRenderer implements Renderer {
 		// Define the Viewport
 		this.width=width;
 		this.height=height;
+
+		lives_x_scale = (float)(1.2 * (1080 / (float)getWidth()));
+		lives_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
+
+		shield_x_scale = (float)(1.7 * (1080 / (float)getWidth()));
+		shield_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
 
 		gl.glViewport(0, 0, width, height);
 	}
