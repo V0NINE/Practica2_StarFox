@@ -7,8 +7,6 @@ import android.content.Context;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
 
-import org.w3c.dom.Text;
-
 public class MyOpenGLRenderer implements Renderer {
 
 	// Ratio of the screen
@@ -19,9 +17,9 @@ public class MyOpenGLRenderer implements Renderer {
 
 	private int frame;
 
-	private TextureCube hud_lives;
-	private TextureCube	lives_count;
-	private TextureCube hud_shield;
+	private HUDTexture hud_lives;
+	private HUDTexture lives_count;
+	private HUDTexture hud_shield;
 
 	float lives_x_scale;
 	float lives_y_scale;
@@ -51,9 +49,9 @@ public class MyOpenGLRenderer implements Renderer {
 		// Image Background color
 		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
-		hud_lives = new TextureCube();
-		lives_count = new TextureCube();
-		hud_shield = new TextureCube();
+		hud_lives = new HUDTexture();
+		lives_count = new HUDTexture();
+		hud_shield = new HUDTexture();
 
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 		lives_count.loadTexture(gl, context, R.raw.lives);
