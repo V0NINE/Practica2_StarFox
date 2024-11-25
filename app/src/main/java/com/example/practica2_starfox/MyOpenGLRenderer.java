@@ -11,16 +11,23 @@ import org.w3c.dom.Text;
 
 public class MyOpenGLRenderer implements Renderer {
 
+	// Ratio of the screen
 	private static final int WIDE_RATIO = 5;
 	private static final int HEIGHT_RATIO = 4;
 
 	private final Context context;
 
+	private int frame;
+
 	private TextureCube hud_lives;
+	private TextureCube	lives_count;
 	private TextureCube hud_shield;
 
 	float lives_x_scale;
 	float lives_y_scale;
+
+	float lives_count_x_scale;
+	float lives_count_y_scale;
 
 	float shield_x_scale;
 	float shield_y_scale;
@@ -45,14 +52,18 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
 		hud_lives = new TextureCube();
+		lives_count = new TextureCube();
 		hud_shield = new TextureCube();
 
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
+		lives_count.loadTexture(gl, context, R.raw.lives);
 		hud_shield.loadTexture(gl, context, R.raw.hud_shield);
 	}
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		frame++;
+
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 		setOrthographicProjection(gl);
@@ -70,6 +81,27 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glScalef(shield_x_scale, shield_y_scale, 0);
 		hud_shield.draw(gl);
 		gl.glPopMatrix();
+
+		gl.glPushMatrix();
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, lives_count.getTextureID());
+		gl.glTranslatef((lives_count_x_scale + (float)(1.77 * (1080 / (float)getWidth())) - WIDE_RATIO),-(lives_count_y_scale + (float)(0.061 * (2285 / (float)getHeight())) - HEIGHT_RATIO),0);
+		gl.glScalef(lives_count_x_scale, lives_count_y_scale, 0);
+		lives_count.draw(gl);
+		gl.glPopMatrix();
+
+		if (frame%120 == 0)
+			setLife();
+	}
+
+	private int left = 0;
+	private int right = 0;
+
+	public void setLife() {
+		left = (left+1)%3;
+		right = (right+1)%3;
+
+		System.out.println("caca");
+		lives_count.setTextureCoords(left,right+1);
 	}
 
 	private void setPerspectiveProjection(GL10 gl) {
@@ -111,12 +143,19 @@ public class MyOpenGLRenderer implements Renderer {
 		this.width=width;
 		this.height=height;
 
+		setHUDScales();  // Maintains the same HUD scale on all screen sizes
+
+		gl.glViewport(0, 0, width, height);
+	}
+
+	private void setHUDScales() {
 		lives_x_scale = (float)(1.2 * (1080 / (float)getWidth()));
-		lives_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
+		lives_y_scale = (float)(0.15 * (2285 / (float)getHeight()));
+
+		lives_count_x_scale = (float)(0.3 * (1080 / (float)getWidth()));
+		lives_count_y_scale = (float)(0.09 * (2285 / (float)getHeight()));
 
 		shield_x_scale = (float)(1.7 * (1080 / (float)getWidth()));
 		shield_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
-
-		gl.glViewport(0, 0, width, height);
 	}
 }

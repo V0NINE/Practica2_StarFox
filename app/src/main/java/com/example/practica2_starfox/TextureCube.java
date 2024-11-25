@@ -29,11 +29,14 @@ public class TextureCube {
             1.0f,  1.0f, 0.0f   // 3. right-top-front
     };
 
+    private int left_index = 0;
+    private int right_index = 3;
+
     float[] texCoords = { // Texture coords for the above face (NEW)
-            0.0f, 1.0f,  // A. left-bottom (NEW)
-            1.0f, 1.0f,  // B. right-bottom (NEW)
-            0.0f, 0.0f,  // C. left-top (NEW)
-            1.0f, 0.0f   // D. right-top (NEW)
+            left_index/3f, 1.0f,  // A. left-bottom (NEW)
+            right_index/3f, 1.0f,  // B. right-bottom (NEW)
+            left_index/3f, 0.0f,  // C. left-top (NEW)
+            right_index/3f, 0.0f   // D. right-top (NEW)
     };
     int[] textureIDs = new int[1];   // Array for 1 texture-ID (NEW)
 
@@ -50,6 +53,22 @@ public class TextureCube {
         ByteBuffer tbb = ByteBuffer.allocateDirect(texCoords.length * 4);
         tbb.order(ByteOrder.nativeOrder());
         texBuffer = tbb.asFloatBuffer();
+        setTextureCoords(this.left_index, this.right_index);
+    }
+
+    public void setTextureCoords(int left_index, int right_index) {
+        System.out.println("de vaca");
+        this.left_index = left_index;
+        this.right_index = right_index;
+
+        System.out.println(texCoords[0]);
+
+        float[] texCoords = { // Texture coords for the above face (NEW)
+                left_index/3f, 1.0f,  // A. left-bottom (NEW)
+                right_index/3f, 1.0f,  // B. right-bottom (NEW)
+                left_index/3f, 0.0f,  // C. left-top (NEW)
+                right_index/3f, 0.0f   // D. right-top (NEW)
+        };
         texBuffer.put(texCoords);
         texBuffer.position(0);
     }
