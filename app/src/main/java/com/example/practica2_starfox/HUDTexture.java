@@ -17,7 +17,6 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
 
 
-
 /*
  * A cube with texture.
  * Define the vertices for only one representative face.
@@ -27,10 +26,20 @@ public class HUDTexture {
     private FloatBuffer vertexBuffer; // Buffer for vertex-array
     private FloatBuffer texBuffer;    // Buffer for texture-coords-array (NEW)
 
-    private float original_width;
-    private float original_height;
+    private float width_screen_ratio;
+    private float height_screen_ratio;
+
+    // Texture Size attributes
+    private final float original_width;
+    private final float original_height;
     private float scale_width;
     private float scale_height;
+
+    // Texture offset attributes
+    private float original_horizontal_offset = 0;
+    private float original_vertical_offset = 0;
+    private float scale_horizontal_offset;
+    private float scale_vertical_offset;
 
     private float[] vertices = { // Vertices for a face
             -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
@@ -188,9 +197,22 @@ public class HUDTexture {
         return textureIDs[0];
     }
 
-    public void setTextureScale(int new_screen_width, int new_screen_height) {
-        this.scale_width = original_width * ((float)ORIGINAL_SCREEN_WIDTH/new_screen_width);
-        this.scale_height = original_height * ((float)ORIGINAL_SCREEN_HEIGHT/new_screen_height);
+    public void setTextureScales(int new_screen_width, int new_screen_height) {
+        this.width_screen_ratio = (float)ORIGINAL_SCREEN_WIDTH/new_screen_width;
+        this.height_screen_ratio = (float)ORIGINAL_SCREEN_HEIGHT/new_screen_height;
+
+        scaleTextureSize();
+        scaleTextureOffset();
+    }
+
+    private void scaleTextureSize() {
+        this.scale_width = original_width * width_screen_ratio;
+        this.scale_height = original_height * height_screen_ratio;
+    }
+
+    private void scaleTextureOffset() {
+        this.scale_horizontal_offset = original_horizontal_offset * width_screen_ratio;
+        this.scale_vertical_offset = original_vertical_offset * height_screen_ratio;
     }
 
     public float setTop() {
@@ -209,11 +231,29 @@ public class HUDTexture {
         return MAX_HORIZONTAL_OFFSET - scale_width;
     }
 
+    public void setHorizontalOffset(float offset) {
+        this.original_horizontal_offset = offset;
+        scaleTextureOffset();
+    }
+
+    public void setVerticalOffset(float offset) {
+        this.original_vertical_offset = offset;
+        scaleTextureOffset();
+    }
+
     public float getTextureWidth() {
         return this.scale_width;
     }
 
     public float getTextureHeight() {
         return this.scale_height;
+    }
+
+    public float getVerticalOffset() {
+        return this.scale_vertical_offset;
+    }
+
+    public float getHorizontalOffset() {
+        return this.scale_horizontal_offset;
     }
 }

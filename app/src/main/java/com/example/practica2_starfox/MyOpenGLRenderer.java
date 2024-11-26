@@ -21,15 +21,6 @@ public class MyOpenGLRenderer implements Renderer {
 	private HUDTexture lives_count;
 	private HUDTexture hud_shield;
 
-	float lives_x_scale;
-	float lives_y_scale;
-
-	float lives_count_x_scale;
-	float lives_count_y_scale;
-
-	float shield_x_scale;
-	float shield_y_scale;
-
 	private int width;
 	private int height;
 
@@ -52,8 +43,14 @@ public class MyOpenGLRenderer implements Renderer {
 		float[] x = {0,1,1/3f,1,0,0,1/3f,0};
 
 		hud_lives = new HUDTexture(1.2f, 0.15f);
-		lives_count = new HUDTexture(0.3f, 0.09f, x);
+		lives_count = new HUDTexture(0.25f, 0.09f, x);
 		hud_shield = new HUDTexture(1.7f, 0.13f);
+
+		lives_count.setHorizontalOffset(1.82f);
+		lives_count.setVerticalOffset(0.06f);
+
+		hud_shield.setHorizontalOffset(0.1f);
+		hud_shield.setVerticalOffset(0.02f);
 
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 		lives_count.loadTexture(gl, context, R.raw.lives);
@@ -75,14 +72,14 @@ public class MyOpenGLRenderer implements Renderer {
 
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_shield.getTextureID());
-		gl.glTranslatef(hud_shield.setLeft() + 0.04f,hud_lives.setBottom() + 0.06f,0);
+		gl.glTranslatef(hud_shield.setLeft() + hud_shield.getHorizontalOffset(),hud_lives.setBottom() + hud_shield.getVerticalOffset(),0);
 		gl.glScalef(hud_shield.getTextureWidth(), hud_shield.getTextureHeight(), 0);
 		hud_shield.draw(gl);
 		gl.glPopMatrix();
 
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, lives_count.getTextureID());
-		gl.glTranslatef(lives_count.setLeft() + (float)(1.77 * (1080 / (float)getWidth())), lives_count.setTop() - (float)(0.061 * (2285 / (float)getHeight())),0);
+		gl.glTranslatef(lives_count.setLeft() + lives_count.getHorizontalOffset(), lives_count.setTop() - lives_count.getVerticalOffset(),0);
 		gl.glScalef(lives_count.getTextureWidth(), lives_count.getTextureHeight(), 0);
 		lives_count.draw(gl);
 		gl.glPopMatrix();
@@ -140,8 +137,8 @@ public class MyOpenGLRenderer implements Renderer {
 	//   - 'newScreenSize' is the current screen size.
 	// The ratio (originalScreenSize / newScreenSize) is the scale factor applied to preserve the size.
 	private void setHUDScales() {
-		hud_lives.setTextureScale(getWidth(),getHeight());
-		lives_count.setTextureScale(getWidth(),getHeight());
-		hud_shield.setTextureScale(getWidth(),getHeight());
+		hud_lives.setTextureScales(getWidth(),getHeight());
+		lives_count.setTextureScales(getWidth(),getHeight());
+		hud_shield.setTextureScales(getWidth(),getHeight());
 	}
 }
