@@ -9,13 +9,13 @@ import android.opengl.GLU;
 
 public class MyOpenGLRenderer implements Renderer {
 
-	// Ratio of the screen
-	private static final int WIDE_RATIO = 5;
-	private static final int HEIGHT_RATIO = 4;
+	public static final int MAX_HORIZONTAL_OFFSET = 5;
+	public static final int MAX_VERTICAL_OFFSET = 4;
+	
+	public static final int ORIGINAL_SCREEN_WIDTH = 1080;
+	public static final int ORIGINAL_SCREEN_HEIGHT = 2285;
 
 	private final Context context;
-
-	private int frame;
 
 	private HUDTexture hud_lives;
 	private HUDTexture lives_count;
@@ -49,9 +49,11 @@ public class MyOpenGLRenderer implements Renderer {
 		// Image Background color
 		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
-		hud_lives = new HUDTexture();
-		lives_count = new HUDTexture();
-		hud_shield = new HUDTexture();
+		float[] x = {0,1,1/3f,1,0,0,1/3f,0};
+
+		hud_lives = new HUDTexture(1.2f, 0.15f);
+		lives_count = new HUDTexture(0.3f, 0.09f, x);
+		hud_shield = new HUDTexture(1.7f, 0.13f);
 
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 		lives_count.loadTexture(gl, context, R.raw.lives);
@@ -60,46 +62,30 @@ public class MyOpenGLRenderer implements Renderer {
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		frame++;
-
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 		setOrthographicProjection(gl);
 
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_lives.getTextureID());
-		gl.glTranslatef((lives_x_scale - WIDE_RATIO),-(lives_y_scale - HEIGHT_RATIO),0);
-		gl.glScalef(lives_x_scale, lives_y_scale, 0);
+		gl.glTranslatef(hud_lives.setLeft(), hud_lives.setTop(),0);
+		gl.glScalef(hud_lives.getTextureWidth(), hud_lives.getTextureHeight(), 0);
 		hud_lives.draw(gl);
 		gl.glPopMatrix();
 
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_shield.getTextureID());
-		gl.glTranslatef((shield_x_scale - WIDE_RATIO) + 0.04f,(shield_y_scale - HEIGHT_RATIO) + 0.06f,0);
-		gl.glScalef(shield_x_scale, shield_y_scale, 0);
+		gl.glTranslatef(hud_shield.setLeft() + 0.04f,hud_lives.setBottom() + 0.06f,0);
+		gl.glScalef(hud_shield.getTextureWidth(), hud_shield.getTextureHeight(), 0);
 		hud_shield.draw(gl);
 		gl.glPopMatrix();
 
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, lives_count.getTextureID());
-		gl.glTranslatef((lives_count_x_scale + (float)(1.77 * (1080 / (float)getWidth())) - WIDE_RATIO),-(lives_count_y_scale + (float)(0.061 * (2285 / (float)getHeight())) - HEIGHT_RATIO),0);
-		gl.glScalef(lives_count_x_scale, lives_count_y_scale, 0);
+		gl.glTranslatef(lives_count.setLeft() + (float)(1.77 * (1080 / (float)getWidth())), lives_count.setTop() - (float)(0.061 * (2285 / (float)getHeight())),0);
+		gl.glScalef(lives_count.getTextureWidth(), lives_count.getTextureHeight(), 0);
 		lives_count.draw(gl);
 		gl.glPopMatrix();
-
-		if (frame%120 == 0)
-			setLife();
-	}
-
-	private int left = 0;
-	private int right = 0;
-
-	public void setLife() {
-		left = (left+1)%3;
-		right = (right+1)%3;
-
-		System.out.println("caca");
-		lives_count.setTextureCoords(left,right+1);
 	}
 
 	private void setPerspectiveProjection(GL10 gl) {
@@ -146,14 +132,16 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glViewport(0, 0, width, height);
 	}
 
+	// This function ensures that an object maintains the same pixel size regardless of the screen size.
+	// Formula: x * (originalScreenSize / newScreenSize)
+	// Where:
+	//   - 'x' is the object's intended size for the original screen resolution.
+	//   - 'originalScreenSize' is the reference screen size.
+	//   - 'newScreenSize' is the current screen size.
+	// The ratio (originalScreenSize / newScreenSize) is the scale factor applied to preserve the size.
 	private void setHUDScales() {
-		lives_x_scale = (float)(1.2 * (1080 / (float)getWidth()));
-		lives_y_scale = (float)(0.15 * (2285 / (float)getHeight()));
-
-		lives_count_x_scale = (float)(0.3 * (1080 / (float)getWidth()));
-		lives_count_y_scale = (float)(0.09 * (2285 / (float)getHeight()));
-
-		shield_x_scale = (float)(1.7 * (1080 / (float)getWidth()));
-		shield_y_scale = (float)(0.13 * (2285 / (float)getHeight()));
+		hud_lives.setTextureScale(getWidth(),getHeight());
+		lives_count.setTextureScale(getWidth(),getHeight());
+		hud_shield.setTextureScale(getWidth(),getHeight());
 	}
 }

@@ -1,5 +1,10 @@
 package com.example.practica2_starfox;
 
+import static com.example.practica2_starfox.MyOpenGLRenderer.ORIGINAL_SCREEN_WIDTH;
+import static com.example.practica2_starfox.MyOpenGLRenderer.ORIGINAL_SCREEN_HEIGHT;
+import static com.example.practica2_starfox.MyOpenGLRenderer.MAX_HORIZONTAL_OFFSET;
+import static com.example.practica2_starfox.MyOpenGLRenderer.MAX_VERTICAL_OFFSET;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -22,6 +27,11 @@ public class HUDTexture {
     private FloatBuffer vertexBuffer; // Buffer for vertex-array
     private FloatBuffer texBuffer;    // Buffer for texture-coords-array (NEW)
 
+    private float original_width;
+    private float original_height;
+    private float scale_width;
+    private float scale_height;
+
     private float[] vertices = { // Vertices for a face
             -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
             1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
@@ -29,19 +39,31 @@ public class HUDTexture {
             1.0f,  1.0f, 0.0f   // 3. right-top-front
     };
 
-    private int left_index = 0;
-    private int right_index = 3;
-
     float[] texCoords = { // Texture coords for the above face (NEW)
-            left_index/3f, 1.0f,  // A. left-bottom (NEW)
-            right_index/3f, 1.0f,  // B. right-bottom (NEW)
-            left_index/3f, 0.0f,  // C. left-top (NEW)
-            right_index/3f, 0.0f   // D. right-top (NEW)
+            0.0f, 1.0f,  // A. left-bottom (NEW)
+            1.0f, 1.0f,  // B. right-bottom (NEW)
+            0.0f, 0.0f,  // C. left-top (NEW)
+            1.0f, 0.0f   // D. right-top (NEW)
     };
     int[] textureIDs = new int[1];   // Array for 1 texture-ID (NEW)
 
-    // Constructor - Set up the buffers
-    public HUDTexture() {
+    public HUDTexture(float width, float height) {
+        this.original_width = width;
+        this.original_height = height;
+
+        setUpTexture();
+    }
+
+    public HUDTexture(float width, float height, float[] texCoords) {
+        this.original_width = width;
+        this.original_height = height;
+        this.texCoords = texCoords;
+
+        setUpTexture();
+    }
+
+    // Set up the buffers for the constructor
+    public void setUpTexture() {
         // Setup vertex-array buffer. Vertices in float. An float has 4 bytes
         ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
         vbb.order(ByteOrder.nativeOrder()); // Use native byte order
@@ -53,10 +75,11 @@ public class HUDTexture {
         ByteBuffer tbb = ByteBuffer.allocateDirect(texCoords.length * 4);
         tbb.order(ByteOrder.nativeOrder());
         texBuffer = tbb.asFloatBuffer();
-        setTextureCoords(this.left_index, this.right_index);
+        texBuffer.put(texCoords);
+        texBuffer.position(0);
     }
 
-    public void setTextureCoords(int left_index, int right_index) {
+    /* public void setTextureCoords(int left_index, int right_index) {
         System.out.println("de vaca");
         this.left_index = left_index;
         this.right_index = right_index;
@@ -71,7 +94,7 @@ public class HUDTexture {
         };
         texBuffer.put(texCoords);
         texBuffer.position(0);
-    }
+    } */
 
     // Draw the shape
     public void draw(GL10 gl) {
@@ -163,5 +186,34 @@ public class HUDTexture {
 
     public int getTextureID() {
         return textureIDs[0];
+    }
+
+    public void setTextureScale(int new_screen_width, int new_screen_height) {
+        this.scale_width = original_width * ((float)ORIGINAL_SCREEN_WIDTH/new_screen_width);
+        this.scale_height = original_height * ((float)ORIGINAL_SCREEN_HEIGHT/new_screen_height);
+    }
+
+    public float setTop() {
+        return MAX_VERTICAL_OFFSET - scale_height;
+    }
+
+    public float setBottom() {
+        return -MAX_VERTICAL_OFFSET + scale_height;
+    }
+
+    public float setLeft() {
+        return -MAX_HORIZONTAL_OFFSET + scale_width;
+    }
+
+    public float setRight() {
+        return MAX_HORIZONTAL_OFFSET - scale_width;
+    }
+
+    public float getTextureWidth() {
+        return this.scale_width;
+    }
+
+    public float getTextureHeight() {
+        return this.scale_height;
     }
 }
