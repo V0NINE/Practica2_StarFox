@@ -13,6 +13,8 @@ public class MyOpenGLRenderer implements Renderer {
 
 	private final Context context;
 
+	private TextureCube background;
+
 	private int width;
 	private int height;
 
@@ -30,12 +32,29 @@ public class MyOpenGLRenderer implements Renderer {
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		// Image Background color
-		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+		gl.glClearColor(1f, 0.3f, 0.4f, 0.5f);
+
+		background = new TextureCube();
+		background.loadTexture(gl, context, R.raw.background);
 	}
+
+	float background_x_scale;
+	float background_y_scale;
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		setPerspectiveProjection(gl);
+
+		background_x_scale = (float)(2.89 * ((float)getWidth()/1080));
+		background_y_scale = (float)(3 * ((float)getHeight()/2285));
+
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+		GLU.gluLookAt(gl, 0, 0, 5, 0, 0, 0, 0, 1, 0);
+
+		gl.glPushMatrix();
+		gl.glScalef(background_x_scale,background_y_scale,0);
+		background.draw(gl);
+		gl.glPopMatrix();
 	}
 
 	private void setPerspectiveProjection(GL10 gl) {
