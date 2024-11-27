@@ -43,6 +43,8 @@ public class HUDTexture {
 
     // Animation attributes
     private int frame_amount = 1;
+    private int frame;
+    private int[] animation;
 
     private float[] vertices = { // Vertices for a face
             -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
@@ -68,10 +70,17 @@ public class HUDTexture {
         setUpTexture();
     }
 
-    public HUDTexture(float width, float height, float[] texCoords) {
+    public HUDTexture(float width, float height, int frame_amount, int initial_frame) {
         this.original_width = width;
         this.original_height = height;
-        this.texCoords = texCoords;
+        this.frame_amount = frame_amount;
+
+        this.texCoords = new float[] {
+                            (float)(initial_frame)/this.frame_amount, 1.0f,
+                            (float)(initial_frame+1)/this.frame_amount, 1.0f,
+                            (float)(initial_frame)/this.frame_amount, 0.0f,
+                            (float)(initial_frame+1)/this.frame_amount, 0.0f
+                        };
 
         setUpTexture();
     }
@@ -93,14 +102,15 @@ public class HUDTexture {
         texBuffer.position(0);
     }
 
-    public void setTextureCoords(int frame_index) {
-        frame_index++;
-        frame_index = frame_index%frame_amount;
+    public void animateTexture() {
+        frame++;
+        frame = frame%frame_amount;
+
         this.texCoords = new float[] {
-                            (float)frame_index/frame_amount, 1.0f,
-                            (float)(frame_index+1)/frame_amount, 1.0f,
-                            (float)frame_index/frame_amount, 0.0f,
-                            (float)(frame_index+1)/frame_amount, 0.0f
+                            (float)animation[frame]/frame_amount, 1.0f,
+                            (float)(animation[frame]+1)/frame_amount, 1.0f,
+                            (float)animation[frame]/frame_amount, 0.0f,
+                            (float)(animation[frame]+1)/frame_amount, 0.0f
                         };
 
         texBuffer.put(texCoords);
@@ -199,8 +209,8 @@ public class HUDTexture {
         return textureIDs[0];
     }
 
-    public void setFrameAmount(int frame_amount) {
-        this.frame_amount = frame_amount;
+    public void setAnimation(int[] animation) {
+        this.animation = animation;
     }
 
     public void setTextureScales(int new_screen_width, int new_screen_height) {

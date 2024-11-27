@@ -26,7 +26,7 @@ public class MyOpenGLRenderer implements Renderer {
 	private int height;
 
 	private int global_frame;
-	private int lives_count_frame;
+	private int live_count_frame;
 
 	public int getWidth() {
 		return width;
@@ -47,11 +47,10 @@ public class MyOpenGLRenderer implements Renderer {
 		hud_lives = new HUDTexture(1.2f, 0.15f);
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 
-		lives_count = new HUDTexture(0.25f, 0.09f, new float[] {2/3f,1, 1,1, 2/3f,0, 1,0});
+		lives_count = new HUDTexture(0.25f, 0.09f, 3, 2);
 		lives_count.setHorizontalOffset(1.82f);
 		lives_count.setVerticalOffset(-0.06f);
-		lives_count.setFrameAmount(3);
-		lives_count_frame = 2;
+		lives_count.setAnimation(new int[] {2,1,0});
 		lives_count.loadTexture(gl, context, R.raw.lives);
 
 		hud_shield = new HUDTexture(1.7f, 0.13f);
@@ -79,14 +78,18 @@ public class MyOpenGLRenderer implements Renderer {
 
 		// Animations sector
 		global_frame++;
-		if (global_frame%60 == 0)
+		if (global_frame%3 == 0)
 			animateHUD();
 	}
 
+	// This function is called 20 times per second
 	private void animateHUD() {
 		// Lives count animation
-		lives_count_frame--;
-		lives_count.setTextureCoords(lives_count_frame);
+		live_count_frame = (live_count_frame+1)%20;
+		if(live_count_frame == 0) 
+			lives_count.animateTexture();
+
+		// Turbo animation
 	}
 
 	private void drawHUDComponent(GL10 gl, HUDTexture component, String verticalSide, String horizontalSide, boolean offset) {
