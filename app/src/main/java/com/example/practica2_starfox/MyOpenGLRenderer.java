@@ -25,6 +25,9 @@ public class MyOpenGLRenderer implements Renderer {
 	private int width;
 	private int height;
 
+	private int global_frame;
+	private int lives_count_frame;
+
 	public int getWidth() {
 		return width;
 	}
@@ -41,14 +44,14 @@ public class MyOpenGLRenderer implements Renderer {
 		// Image Background color
 		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
-		float[] x = {0,1,1/3f,1,0,0,1/3f,0};
-
 		hud_lives = new HUDTexture(1.2f, 0.15f);
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 
-		lives_count = new HUDTexture(0.25f, 0.09f, x);
+		lives_count = new HUDTexture(0.25f, 0.09f, new float[] {2/3f,1, 1,1, 2/3f,0, 1,0});
 		lives_count.setHorizontalOffset(1.82f);
 		lives_count.setVerticalOffset(-0.06f);
+		lives_count.setFrameAmount(3);
+		lives_count_frame = 2;
 		lives_count.loadTexture(gl, context, R.raw.lives);
 
 		hud_shield = new HUDTexture(1.7f, 0.13f);
@@ -66,12 +69,24 @@ public class MyOpenGLRenderer implements Renderer {
 	public void onDrawFrame(GL10 gl) {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
+		// Draw HUD
 		setOrthographicProjection(gl);
 
 		drawHUDComponent(gl, hud_lives, "top", "left", false);
 		drawHUDComponent(gl, lives_count, "top", "left", true);
 		drawHUDComponent(gl, hud_shield, "bottom", "left", true);
 		drawHUDComponent(gl, hud_turbo, "bottom", "right", true);
+
+		// Animations sector
+		global_frame++;
+		if (global_frame%60 == 0)
+			animateHUD();
+	}
+
+	private void animateHUD() {
+		// Lives count animation
+		lives_count_frame--;
+		lives_count.setTextureCoords(lives_count_frame);
 	}
 
 	private void drawHUDComponent(GL10 gl, HUDTexture component, String verticalSide, String horizontalSide, boolean offset) {

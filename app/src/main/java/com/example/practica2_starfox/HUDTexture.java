@@ -41,6 +41,9 @@ public class HUDTexture {
     private float scale_horizontal_offset;
     private float scale_vertical_offset;
 
+    // Animation attributes
+    private int frame_amount = 1;
+
     private float[] vertices = { // Vertices for a face
             -1.0f, -1.0f, 0.0f,  // 0. left-bottom-front
             1.0f, -1.0f, 0.0f,  // 1. right-bottom-front
@@ -48,17 +51,19 @@ public class HUDTexture {
             1.0f,  1.0f, 0.0f   // 3. right-top-front
     };
 
-    float[] texCoords = { // Texture coords for the above face (NEW)
-            0.0f, 1.0f,  // A. left-bottom (NEW)
-            1.0f, 1.0f,  // B. right-bottom (NEW)
-            0.0f, 0.0f,  // C. left-top (NEW)
-            1.0f, 0.0f   // D. right-top (NEW)
-    };
+    float[] texCoords;
+
     int[] textureIDs = new int[1];   // Array for 1 texture-ID (NEW)
 
     public HUDTexture(float width, float height) {
         this.original_width = width;
         this.original_height = height;
+        this.texCoords = new float[] { // Texture coords for the above face (NEW)
+                            0.0f, 1.0f,  // A. left-bottom (NEW)
+                            1.0f, 1.0f,  // B. right-bottom (NEW)
+                            0.0f, 0.0f,  // C. left-top (NEW)
+                            1.0f, 0.0f   // D. right-top (NEW)
+                        };
 
         setUpTexture();
     }
@@ -88,22 +93,19 @@ public class HUDTexture {
         texBuffer.position(0);
     }
 
-    /* public void setTextureCoords(int left_index, int right_index) {
-        System.out.println("de vaca");
-        this.left_index = left_index;
-        this.right_index = right_index;
+    public void setTextureCoords(int frame_index) {
+        frame_index++;
+        frame_index = frame_index%frame_amount;
+        this.texCoords = new float[] {
+                            (float)frame_index/frame_amount, 1.0f,
+                            (float)(frame_index+1)/frame_amount, 1.0f,
+                            (float)frame_index/frame_amount, 0.0f,
+                            (float)(frame_index+1)/frame_amount, 0.0f
+                        };
 
-        System.out.println(texCoords[0]);
-
-        float[] texCoords = { // Texture coords for the above face (NEW)
-                left_index/3f, 1.0f,  // A. left-bottom (NEW)
-                right_index/3f, 1.0f,  // B. right-bottom (NEW)
-                left_index/3f, 0.0f,  // C. left-top (NEW)
-                right_index/3f, 0.0f   // D. right-top (NEW)
-        };
         texBuffer.put(texCoords);
         texBuffer.position(0);
-    } */
+    }
 
     // Draw the shape
     public void draw(GL10 gl) {
@@ -195,6 +197,10 @@ public class HUDTexture {
 
     public int getTextureID() {
         return textureIDs[0];
+    }
+
+    public void setFrameAmount(int frame_amount) {
+        this.frame_amount = frame_amount;
     }
 
     public void setTextureScales(int new_screen_width, int new_screen_height) {
