@@ -20,6 +20,7 @@ public class MyOpenGLRenderer implements Renderer {
 	private HUDTexture hud_lives;
 	private HUDTexture lives_count;
 	private HUDTexture hud_shield;
+	private HUDTexture hud_turbo;
 
 	private int width;
 	private int height;
@@ -43,18 +44,22 @@ public class MyOpenGLRenderer implements Renderer {
 		float[] x = {0,1,1/3f,1,0,0,1/3f,0};
 
 		hud_lives = new HUDTexture(1.2f, 0.15f);
-		lives_count = new HUDTexture(0.25f, 0.09f, x);
-		hud_shield = new HUDTexture(1.7f, 0.13f);
+		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 
+		lives_count = new HUDTexture(0.25f, 0.09f, x);
 		lives_count.setHorizontalOffset(1.82f);
 		lives_count.setVerticalOffset(-0.06f);
-
-		hud_shield.setHorizontalOffset(0.1f);
-		hud_shield.setVerticalOffset(0.02f);
-
-		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
 		lives_count.loadTexture(gl, context, R.raw.lives);
+
+		hud_shield = new HUDTexture(1.7f, 0.13f);
+		hud_shield.setHorizontalOffset(0.1f);
+		hud_shield.setVerticalOffset(0.04f);
 		hud_shield.loadTexture(gl, context, R.raw.hud_shield);
+
+		hud_turbo = new HUDTexture(1.7f, 0.13f);
+		hud_turbo.setHorizontalOffset(0.1f);
+		hud_turbo.setVerticalOffset(0.04f);
+		hud_turbo.loadTexture(gl, context,R.raw.hud_turbo);
 	}
 
 	@Override
@@ -66,6 +71,7 @@ public class MyOpenGLRenderer implements Renderer {
 		drawHUDComponent(gl, hud_lives, "top", "left", false);
 		drawHUDComponent(gl, lives_count, "top", "left", true);
 		drawHUDComponent(gl, hud_shield, "bottom", "left", true);
+		drawHUDComponent(gl, hud_turbo, "bottom", "right", true);
 	}
 
 	private void drawHUDComponent(GL10 gl, HUDTexture component, String verticalSide, String horizontalSide, boolean offset) {
@@ -150,8 +156,9 @@ public class MyOpenGLRenderer implements Renderer {
 	//   - 'newScreenSize' is the current screen size.
 	// The ratio (originalScreenSize / newScreenSize) is the scale factor applied to preserve the size.
 	private void setHUDScales() {
-		hud_lives.setTextureScales(getWidth(),getHeight());
-		lives_count.setTextureScales(getWidth(),getHeight());
-		hud_shield.setTextureScales(getWidth(),getHeight());
+		hud_lives.setTextureScales(getWidth(), getHeight());
+		lives_count.setTextureScales(getWidth(), getHeight());
+		hud_shield.setTextureScales(getWidth(), getHeight());
+		hud_turbo.setTextureScales(getWidth(), getHeight());
 	}
 }
