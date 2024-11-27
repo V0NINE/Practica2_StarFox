@@ -47,7 +47,7 @@ public class MyOpenGLRenderer implements Renderer {
 		hud_shield = new HUDTexture(1.7f, 0.13f);
 
 		lives_count.setHorizontalOffset(1.82f);
-		lives_count.setVerticalOffset(0.06f);
+		lives_count.setVerticalOffset(-0.06f);
 
 		hud_shield.setHorizontalOffset(0.1f);
 		hud_shield.setVerticalOffset(0.02f);
@@ -63,25 +63,38 @@ public class MyOpenGLRenderer implements Renderer {
 
 		setOrthographicProjection(gl);
 
-		gl.glPushMatrix();
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_lives.getTextureID());
-		gl.glTranslatef(hud_lives.setLeft(), hud_lives.setTop(),0);
-		gl.glScalef(hud_lives.getTextureWidth(), hud_lives.getTextureHeight(), 0);
-		hud_lives.draw(gl);
-		gl.glPopMatrix();
+		drawHUDComponent(gl, hud_lives, "top", "left", false);
+		drawHUDComponent(gl, lives_count, "top", "left", true);
+		drawHUDComponent(gl, hud_shield, "bottom", "left", true);
+	}
 
+	private void drawHUDComponent(GL10 gl, HUDTexture component, String verticalSide, String horizontalSide, boolean offset) {
 		gl.glPushMatrix();
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, hud_shield.getTextureID());
-		gl.glTranslatef(hud_shield.setLeft() + hud_shield.getHorizontalOffset(),hud_lives.setBottom() + hud_shield.getVerticalOffset(),0);
-		gl.glScalef(hud_shield.getTextureWidth(), hud_shield.getTextureHeight(), 0);
-		hud_shield.draw(gl);
-		gl.glPopMatrix();
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, component.getTextureID());
 
-		gl.glPushMatrix();
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, lives_count.getTextureID());
-		gl.glTranslatef(lives_count.setLeft() + lives_count.getHorizontalOffset(), lives_count.setTop() - lives_count.getVerticalOffset(),0);
-		gl.glScalef(lives_count.getTextureWidth(), lives_count.getTextureHeight(), 0);
-		lives_count.draw(gl);
+		if (offset)
+			gl.glTranslatef(component.getHorizontalOffset(), component.getVerticalOffset(), 0);
+
+		switch(verticalSide) {
+			case "top":
+				gl.glTranslatef(0, component.setTop(), 0);
+				break;
+			case "bottom":
+				gl.glTranslatef(0, component.setBottom(), 0);
+				break;
+		}
+
+		switch(horizontalSide) {
+			case "left":
+				gl.glTranslatef(component.setLeft(), 0, 0);
+				break;
+			case "right":
+				gl.glTranslatef(component.setRight(), 0, 0);
+				break;
+		}
+
+		gl.glScalef(component.getTextureWidth(), component.getTextureHeight(), 0);
+		component.draw(gl);
 		gl.glPopMatrix();
 	}
 
