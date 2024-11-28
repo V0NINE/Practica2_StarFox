@@ -71,8 +71,10 @@ public class MyOpenGLRenderer implements Renderer {
 	public float getStarY() { return this.star_y; }
 	public float getStarX() { return this.star_x; }
 
-	private float inclination;
-	public void setInclination(float inclination) { this.inclination = inclination; }
+	private float lateral_inclination;
+	private float vertical_inclination;
+	public void setLateralInclination(float inclination) { this.lateral_inclination = inclination; }
+	public void setVerticalInclination(float inclination) { this.vertical_inclination = inclination; }
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
@@ -86,7 +88,7 @@ public class MyOpenGLRenderer implements Renderer {
 
 		if(starship_idle) {
 			state += 0.05f;
-			hover = (float)Math.sin(state) * 0.08f;
+			hover = (float)Math.sin(state) * 0.1f;
 			gl.glTranslatef(star_x, -star_y + hover, 0);
 		}
 		else {
@@ -94,7 +96,8 @@ public class MyOpenGLRenderer implements Renderer {
 			gl.glTranslatef(star_x, -star_y, 0);
 		}
 
-		gl.glRotatef(-this.inclination,0,0,1);
+		gl.glRotatef(-this.vertical_inclination,1,0,0);
+		gl.glRotatef(-this.lateral_inclination,0,0,1);
 		gl.glRotatef(180,0, 1, 0 );
 		starwing.draw(gl);
 		gl.glPopMatrix();

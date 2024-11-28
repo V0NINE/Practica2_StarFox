@@ -51,7 +51,8 @@ public class MainActivity extends Activity {
                 myGLRenderer.setStarY(myGLRenderer.getStarY() + dy/130);
                 myGLRenderer.setStarX(myGLRenderer.getStarX() + dx/130);
 
-                myGLRenderer.setInclination(dx/3);
+                myGLRenderer.setLateralInclination(dx/3);
+                myGLRenderer.setVerticalInclination(dy/2);
         }
 
         previous_x = x;
