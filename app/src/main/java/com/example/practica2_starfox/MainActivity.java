@@ -13,8 +13,7 @@ public class MainActivity extends Activity {
     private Runnable idle_runnable = new Runnable() {
         @Override
         public void run() {
-            System.out.println("Pipero master");
-            myGLRenderer.setStarIdle(true);
+            myGLRenderer.getStarwing().setStarIdle(true);
         }
     };
 
@@ -36,23 +35,19 @@ public class MainActivity extends Activity {
         float y = e.getY();
 
         idle_handler.removeCallbacks(idle_runnable);
-        if(myGLRenderer.getStarIdle())
-            myGLRenderer.setStarIdle(false);
+        if(myGLRenderer.getStarwing().getStarIdle())
+            myGLRenderer.getStarwing().setStarIdle(false);
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
                 float dx = x - previous_x;
                 float dy = y - previous_y;
 
-                //System.out.println("Pipero " + myGLRenderer.getStarY() + " - " + myGLRenderer.getStarX());
-                System.out.println("Pipero " + dx);
+                myGLRenderer.getStarwing().setStarY(myGLRenderer.getStarwing().getStarY() + dy/130);
+                myGLRenderer.getStarwing().setStarX(myGLRenderer.getStarwing().getStarX() + dx/130);
 
-                //myGLRenderer.setStarY(myGLRenderer.getStarY() + ((dy>0)?-0.1f:0.1f));
-                myGLRenderer.setStarY(myGLRenderer.getStarY() + dy/130);
-                myGLRenderer.setStarX(myGLRenderer.getStarX() + dx/130);
-
-                myGLRenderer.setLateralInclination(dx/3);
-                myGLRenderer.setVerticalInclination(dy/2);
+                myGLRenderer.getStarwing().setLateralInclination(dx/3);
+                myGLRenderer.getStarwing().setVerticalInclination(dy/2);
         }
 
         previous_x = x;

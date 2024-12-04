@@ -6,19 +6,18 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
+import java.lang.System;
 
 public class MyOpenGLRenderer implements Renderer {
 
 	private final Context context;
 
-	private Object3D starwing;
+	private Starwing starwing;
 
 	private Light light;
 
 	private int width;
 	private int height;
-
-	private int frame;
 
 	public int getWidth() {
 		return width;
@@ -45,36 +44,11 @@ public class MyOpenGLRenderer implements Renderer {
 		light.setAmbientColor(new float[]{0.3f, 0.3f, 0.1f});
 		light.setDiffuseColor(new float[]{1f, 1f, 1f});
 
-		starwing = new Object3D(context, R.raw.starwing);
+		starwing = new Starwing(context, R.raw.starwing);
 	}
 
-	private float star_y;
-	private float star_x;
-	private boolean starship_idle;
 	private float hover;
 	private float state;
-
-	public void setStarY(float y) {
-		if(y > 6.3f)
-			this.star_y = 6.3f;
-		else this.star_y = Math.max(y, -6f);
-	}
-	public void setStarX(float x) {
-		if(x > 2.8f)
-			this.star_x = 2.8f;
-		else this.star_x = Math.max(x, -2.8f);
-	}
-
-	public void setStarIdle(boolean idle) { this.starship_idle = idle; }
-	public boolean getStarIdle() { return this.starship_idle; }
-
-	public float getStarY() { return this.star_y; }
-	public float getStarX() { return this.star_x; }
-
-	private float lateral_inclination;
-	private float vertical_inclination;
-	public void setLateralInclination(float inclination) { this.lateral_inclination = inclination; }
-	public void setVerticalInclination(float inclination) { this.vertical_inclination = inclination; }
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
@@ -86,18 +60,15 @@ public class MyOpenGLRenderer implements Renderer {
 
 		gl.glPushMatrix();
 
-		if(starship_idle) {
-			state += 0.05f;
-			hover = (float)Math.sin(state) * 0.1f;
-			gl.glTranslatef(star_x, -star_y + hover, 0);
+		if(starwing.getStarIdle()) {
+			gl.glTranslatef(starwing.getStarX(), -starwing.getVerticalHover(), 0);
 		}
 		else {
-			state = 0;
-			gl.glTranslatef(star_x, -star_y, 0);
+			gl.glTranslatef(starwing.getStarX(), -starwing.getStarY(), 0);
 		}
 
-		gl.glRotatef(-this.vertical_inclination,1,0,0);
-		gl.glRotatef(-this.lateral_inclination,0,0,1);
+		gl.glRotatef(-starwing.getVerticalInclination(),1,0,0);
+		gl.glRotatef(-starwing.getLateralInclination(),0,0,1);
 		gl.glRotatef(180,0, 1, 0 );
 		starwing.draw(gl);
 		gl.glPopMatrix();
@@ -141,5 +112,9 @@ public class MyOpenGLRenderer implements Renderer {
 		this.height=height;
 
 		gl.glViewport(0, 0, width, height);
+	}
+
+	public Starwing getStarwing() {
+		return this.starwing;
 	}
 }
