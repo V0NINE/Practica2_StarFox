@@ -43,7 +43,6 @@ public class MyOpenGLRenderer implements Renderer {
 
 	private TextureCube background;
 
-	private Object3D spacexip;
 	private Light light;
 
 	private int width;
@@ -68,8 +67,6 @@ public class MyOpenGLRenderer implements Renderer {
 		background = new TextureCube();
 		background.loadTexture(gl, context, R.raw.background_alt);
 
-		spacexip = new Object3D(context, R.raw.starwing);
-
 		gl.glEnable(GL10.GL_LIGHTING);
 
 		light = new Light(gl, GL10.GL_LIGHT0);
@@ -80,29 +77,19 @@ public class MyOpenGLRenderer implements Renderer {
 
 	}
 
-	float y_ship = yCam;
-
 	@Override
 	public void onDrawFrame(GL10 gl) {
-
-
-		System.out.println("CACA " + y_ship);
 		setPerspectiveProjection(gl);
 
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		GLU.gluLookAt(gl, xCam, -yCam, 5, xCam, -yCam, 0, 0, 1, 0);
-		//System.out.println("CACA " + xCam + " " + yCam);
+		GLU.gluLookAt(gl, 0, 0, 5, 0, 0, 0, 0, 1, 0);
+
+		gl.glDisable(GL10.GL_LIGHTING);
 
 		gl.glPushMatrix();
 		gl.glTranslatef(0,1,-2);
 		gl.glScalef(10,5,0);
 		background.draw(gl);
-		gl.glPopMatrix();
-
-		gl.glPushMatrix();
-		gl.glTranslatef(xCam*3.5f,-yCam*3.5f,0);
-		gl.glRotatef(180,0,1,0);
-		spacexip.draw(gl);
 		gl.glPopMatrix();
 	}
 
