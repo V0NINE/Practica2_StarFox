@@ -9,6 +9,9 @@ import android.opengl.GLU;
 
 public class MyOpenGLRenderer implements Renderer {
 
+	public static final int ORIGINAL_SCREEN_WIDTH = 1080;
+	public static final int ORIGINAL_SCREEN_HEIGHT = 2285;
+
 	public float getxCam() {
 		return xCam;
 	}
@@ -78,21 +81,19 @@ public class MyOpenGLRenderer implements Renderer {
 		starwing = new Starwing(context, R.raw.starwing);
 	}
 
-	private float hover;
-	private float state;
-
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		// Initial settings
 		setPerspectiveProjection(gl);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		GLU.gluLookAt(gl, 0, 0.8f, 15, 0, 0, 0, 0, 1, 0);
+		GLU.gluLookAt(gl, starwing.getStarX()/3f, -starwing.getStarY()/5, 25,
+					      starwing.getStarX()/3f, -starwing.getStarY()/5, 0,
+				          0, 1, 0);
 		gl.glDisable(GL10.GL_LIGHTING);
 
 		// Background block
 		gl.glPushMatrix();
-		gl.glTranslatef(0,1,-2);
-		gl.glScalef(10,5,0);
+		gl.glScalef(65*aspect,35*aspect,0);
 		background.draw(gl);
 		gl.glPopMatrix();
 
@@ -100,6 +101,7 @@ public class MyOpenGLRenderer implements Renderer {
 
 		// Starwing block
 		gl.glPushMatrix();
+		gl.glTranslatef(0,0, 35*aspect);
 
 		if(starwing.getStarIdle()) {
 			gl.glTranslatef(starwing.getStarX(), -starwing.getVerticalHover(), 0);
@@ -146,11 +148,14 @@ public class MyOpenGLRenderer implements Renderer {
 	}
 
 	private float aspect;
+
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		// Define the Viewport
 		this.width=width;
 		this.height=height;
+
+		aspect = (float)this.width / this.height;
 
 		gl.glViewport(0, 0, width, height);
 	}

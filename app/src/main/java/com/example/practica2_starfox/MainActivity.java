@@ -3,19 +3,9 @@ package com.example.practica2_starfox;
 import android.os.Bundle;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
-import android.os.Handler;
 import android.view.MotionEvent;
 
 public class MainActivity extends Activity {
-
-    private static final int IDLE_TIMEOUT = 300;
-    private Handler idle_handler = new Handler();
-    private Runnable idle_runnable = new Runnable() {
-        @Override
-        public void run() {
-            myGLRenderer.getStarwing().setStarIdle(true);
-        }
-    };
 
     MyOpenGLRenderer myGLRenderer;
     float previous_x, previous_y;
@@ -34,7 +24,6 @@ public class MainActivity extends Activity {
         float x = e.getX();
         float y = e.getY();
 
-        idle_handler.removeCallbacks(idle_runnable);
         if(myGLRenderer.getStarwing().getStarIdle())
             myGLRenderer.getStarwing().setStarIdle(false);
 
@@ -48,12 +37,17 @@ public class MainActivity extends Activity {
 
                 myGLRenderer.getStarwing().setLateralInclination(dx/3);
                 myGLRenderer.getStarwing().setVerticalInclination(dy/2);
+
+                break;
+            case MotionEvent.ACTION_UP:
+                myGLRenderer.getStarwing().setLateralInclination(0);
+                myGLRenderer.getStarwing().setVerticalInclination(0);
+                myGLRenderer.getStarwing().setStarIdle(true);
+                break;
         }
 
         previous_x = x;
         previous_y = y;
-
-        idle_handler.postDelayed(idle_runnable, IDLE_TIMEOUT);
 
         return true;
     }

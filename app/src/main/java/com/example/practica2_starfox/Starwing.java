@@ -9,19 +9,19 @@ public class Starwing extends Object3D{
     private float star_x;
     private float lateral_inclination;
     private float vertical_inclination;
-    private boolean starship_idle;
+    private boolean starship_idle = true;
 
     public Starwing(Context ctx, int filenameId) {
         super(ctx, filenameId);
     }
 
     public void setStarY(float y) {
-        // -6.3 < star_y < 6.3
-        this.star_y = Math.max(Math.min(y,6.3f),-6.3f);
+        // -7 < star_y < 6
+        this.star_y = Math.max(Math.min(y,6f),-7f);
     }
     public void setStarX(float x) {
-        // -2.8 < star_x < 2.8
-        this.star_x = Math.max(Math.min(x,2.8f),-2.8f);
+        // -3 < star_x < 3
+        this.star_x = Math.max(Math.min(x,3f),-3f);
     }
 
     public void setStarIdle(boolean idle) { this.starship_idle = idle; }
