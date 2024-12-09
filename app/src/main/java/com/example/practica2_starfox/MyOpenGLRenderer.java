@@ -7,8 +7,6 @@ import android.content.Context;
 import android.opengl.GLSurfaceView.Renderer;
 import android.opengl.GLU;
 
-import org.w3c.dom.Text;
-
 public class MyOpenGLRenderer implements Renderer {
 
 	public float getxCam() {
@@ -42,6 +40,7 @@ public class MyOpenGLRenderer implements Renderer {
 	private final Context context;
 
 	private TextureCube background;
+	private Starwing starwing;
 
 	private Light light;
 
@@ -62,34 +61,57 @@ public class MyOpenGLRenderer implements Renderer {
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		// Image Background color
-		gl.glClearColor(1f, 0.3f, 0.4f, 0.5f);
+		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
 		background = new TextureCube();
 		background.loadTexture(gl, context, R.raw.background_alt);
 
 		gl.glEnable(GL10.GL_LIGHTING);
+		gl.glEnable(GL10.GL_NORMALIZE);
 
 		light = new Light(gl, GL10.GL_LIGHT0);
-		light.setPosition(new float[]{0, 5, 15, 0.0f});
+		light.setPosition(new float[] {2, 5, 5, 0});
 
-		light.setAmbientColor(new float[]{1f, 1f, 1f});
-		light.setDiffuseColor(new float[]{1, 1, 1});
+		light.setAmbientColor(new float[]{0.3f, 0.3f, 0.1f});
+		light.setDiffuseColor(new float[]{1f, 1f, 1f});
 
+		starwing = new Starwing(context, R.raw.starwing);
 	}
+
+	private float hover;
+	private float state;
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		// Initial settings
 		setPerspectiveProjection(gl);
-
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		GLU.gluLookAt(gl, 0, 0, 5, 0, 0, 0, 0, 1, 0);
-
+		GLU.gluLookAt(gl, 0, 0.8f, 15, 0, 0, 0, 0, 1, 0);
 		gl.glDisable(GL10.GL_LIGHTING);
 
+		// Background block
 		gl.glPushMatrix();
 		gl.glTranslatef(0,1,-2);
 		gl.glScalef(10,5,0);
 		background.draw(gl);
+		gl.glPopMatrix();
+
+		gl.glEnable(GL10.GL_LIGHTING);
+
+		// Starwing block
+		gl.glPushMatrix();
+
+		if(starwing.getStarIdle()) {
+			gl.glTranslatef(starwing.getStarX(), -starwing.getVerticalHover(), 0);
+		}
+		else {
+			gl.glTranslatef(starwing.getStarX(), -starwing.getStarY(), 0);
+		}
+
+		gl.glRotatef(-starwing.getVerticalInclination(),1,0,0);
+		gl.glRotatef(-starwing.getLateralInclination(),0,0,1);
+		gl.glRotatef(180,0, 1, 0 );
+		starwing.draw(gl);
 		gl.glPopMatrix();
 	}
 
@@ -123,6 +145,7 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glLoadIdentity();
 	}
 
+	private float aspect;
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		// Define the Viewport
@@ -130,5 +153,9 @@ public class MyOpenGLRenderer implements Renderer {
 		this.height=height;
 
 		gl.glViewport(0, 0, width, height);
+	}
+
+	public Starwing getStarwing() {
+		return this.starwing;
 	}
 }
