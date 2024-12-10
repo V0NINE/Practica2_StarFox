@@ -1,7 +1,5 @@
 package com.example.practica2_starfox;
 
-import static com.example.practica2_starfox.MyOpenGLRenderer.ORIGINAL_SCREEN_WIDTH;
-import static com.example.practica2_starfox.MyOpenGLRenderer.ORIGINAL_SCREEN_HEIGHT;
 import static com.example.practica2_starfox.MyOpenGLRenderer.MAX_HORIZONTAL_OFFSET;
 import static com.example.practica2_starfox.MyOpenGLRenderer.MAX_VERTICAL_OFFSET;
 
@@ -25,9 +23,6 @@ import android.opengl.GLUtils;
 public class HUDTexture {
     private FloatBuffer vertexBuffer; // Buffer for vertex-array
     private FloatBuffer texBuffer;    // Buffer for texture-coords-array (NEW)
-
-    private float width_screen_ratio;
-    private float height_screen_ratio;
 
     // Texture Size attributes
     private final float original_width;
@@ -213,22 +208,19 @@ public class HUDTexture {
         this.animation = animation;
     }
 
-    public void setTextureScales(int new_screen_width, int new_screen_height) {
-        this.width_screen_ratio = (float)ORIGINAL_SCREEN_WIDTH/new_screen_width;
-        this.height_screen_ratio = (float)ORIGINAL_SCREEN_HEIGHT/new_screen_height;
-
+    public void setTextureScales() {
         scaleTextureSize();
         scaleTextureOffset();
     }
 
     private void scaleTextureSize() {
-        this.scale_width = original_width * width_screen_ratio;
-        this.scale_height = original_height * height_screen_ratio;
+        this.scale_width = original_width;
+        this.scale_height = original_height;
     }
 
     private void scaleTextureOffset() {
-        this.scale_horizontal_offset = original_horizontal_offset * width_screen_ratio;
-        this.scale_vertical_offset = original_vertical_offset * height_screen_ratio;
+        this.scale_horizontal_offset = original_horizontal_offset;
+        this.scale_vertical_offset = original_vertical_offset;
     }
 
     public float setTop() {
