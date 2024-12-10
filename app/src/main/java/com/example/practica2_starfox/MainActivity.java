@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
                 float dx = x - previous_x;
                 float dy = y - previous_y;
 
-                myGLRenderer.getStarwing().setStarY(myGLRenderer.getStarwing().getStarY() + dy/90);
+                myGLRenderer.getStarwing().setStarY(myGLRenderer.getStarwing().getStarY() + dy/80);
                 myGLRenderer.getStarwing().setStarX(myGLRenderer.getStarwing().getStarX() + dx/80);
 
                 myGLRenderer.getStarwing().setLateralInclination(dx/3);

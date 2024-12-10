@@ -96,32 +96,15 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		GLU.gluLookAt(gl, starwing.getStarX()/6f, -starwing.getStarY()/5, 10,
 					      starwing.getStarX()/6f, -starwing.getStarY()/5, 0,
-				          starwing.getLateralInclination()/900, 1f, 0f);
-		//GLU.gluLookAt(gl,20,10,6,5,0,0,0,1,0);
-		gl.glDisable(GL10.GL_LIGHTING);
+				          starwing.getLateralInclination()/600, 1f, 0f);
+		//GLU.gluLookAt(gl,20,10,6,5,0,0,0,1,0); maybe vigilance camera mode
 
 		// Background block
+		gl.glDisable(GL10.GL_LIGHTING);
 
-		gl.glPushMatrix();
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, background.getTextureID());
-		gl.glScalef(55,22,1);
-		gl.glTranslatef(0,0.5f,-26);
-		background.draw(gl);
-		gl.glPopMatrix();
-
-		gl.glPushMatrix();
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, clouds.getTextureID());
-		gl.glScalef(45,5,1);
-		gl.glTranslatef(0,0.55f,-22);
-		clouds.draw(gl);
-		gl.glPopMatrix();
-
-		gl.glPushMatrix();
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, mountains.getTextureID());
-		gl.glScalef(45,25,1);
-		gl.glTranslatef(0,0.15f,-15);
-		mountains.draw(gl);
-		gl.glPopMatrix();
+		drawBackgroundComponent(gl, background, new float[]{55,22,1}, new float[]{0,0.5f,-26});
+		drawBackgroundComponent(gl, clouds, new float[]{45,5,1}, new float[]{0,0.55f,-22});
+		drawBackgroundComponent(gl, mountains, new float[]{45,25,1}, new float[]{0,0.15f,-15});
 
 		gl.glEnable(GL10.GL_LIGHTING);
 
@@ -141,6 +124,15 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glRotatef(-starwing.getLateralInclination(),0,0,1);
 		gl.glRotatef(180,0, 1, 0 );
 		starwing.draw(gl);
+		gl.glPopMatrix();
+	}
+
+	private void drawBackgroundComponent(GL10 gl, TextureCube component, float[] scale, float[] translation) {
+		gl.glPushMatrix();
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, component.getTextureID());
+		gl.glScalef(scale[0],scale[1],scale[2]);
+		gl.glTranslatef(translation[0],translation[1],translation[2]);
+		component.draw(gl);
 		gl.glPopMatrix();
 	}
 
