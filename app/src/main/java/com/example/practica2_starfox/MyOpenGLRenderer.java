@@ -43,6 +43,8 @@ public class MyOpenGLRenderer implements Renderer {
 	private final Context context;
 
 	private TextureCube background;
+	private TextureCube mountains;
+	private TextureCube clouds;
 	private Starwing starwing;
 
 	private Light light;
@@ -67,7 +69,13 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glClearColor(0.2f, 0.3f, 0.4f, 0.5f);
 
 		background = new TextureCube();
-		background.loadTexture(gl, context, R.raw.background_alt);
+		background.loadTexture(gl, context, R.raw.fondo);
+
+		mountains = new TextureCube();
+		mountains.loadTexture(gl, context, R.raw.muntanyes);
+
+		clouds = new TextureCube();
+		clouds.loadTexture(gl, context, R.raw.nubols);
 
 		gl.glEnable(GL10.GL_LIGHTING);
 		gl.glEnable(GL10.GL_NORMALIZE);
@@ -86,22 +94,41 @@ public class MyOpenGLRenderer implements Renderer {
 		// Initial settings
 		setPerspectiveProjection(gl);
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-		GLU.gluLookAt(gl, starwing.getStarX()/3f, -starwing.getStarY()/5, 25,
-					      starwing.getStarX()/3f, -starwing.getStarY()/5, 0,
-				          0, 1, 0);
+		GLU.gluLookAt(gl, starwing.getStarX()/6f, -starwing.getStarY()/5, 10,
+					      starwing.getStarX()/6f, -starwing.getStarY()/5, 0,
+				          starwing.getLateralInclination()/900, 1f, 0f);
+		//GLU.gluLookAt(gl,20,10,6,5,0,0,0,1,0);
 		gl.glDisable(GL10.GL_LIGHTING);
 
 		// Background block
+
 		gl.glPushMatrix();
-		gl.glScalef(65*aspect,35*aspect,0);
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, background.getTextureID());
+		gl.glScalef(55,22,1);
+		gl.glTranslatef(0,0.5f,-26);
 		background.draw(gl);
+		gl.glPopMatrix();
+
+		gl.glPushMatrix();
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, clouds.getTextureID());
+		gl.glScalef(45,5,1);
+		gl.glTranslatef(0,0.55f,-22);
+		clouds.draw(gl);
+		gl.glPopMatrix();
+
+		gl.glPushMatrix();
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, mountains.getTextureID());
+		gl.glScalef(45,25,1);
+		gl.glTranslatef(0,0.15f,-15);
+		mountains.draw(gl);
 		gl.glPopMatrix();
 
 		gl.glEnable(GL10.GL_LIGHTING);
 
 		// Starwing block
 		gl.glPushMatrix();
-		gl.glTranslatef(0,0, 35*aspect);
+
+		//gl.glTranslatef(0,0, 35);
 
 		if(starwing.getStarIdle()) {
 			gl.glTranslatef(starwing.getStarX(), -starwing.getVerticalHover(), 0);
@@ -132,6 +159,9 @@ public class MyOpenGLRenderer implements Renderer {
 		// Use perspective projection
 		GLU.gluPerspective(gl, 60, (float) width / height, 0.1f, 100.f);
 
+		gl.glEnable(GL10.GL_BLEND);  // enables image transparency
+		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);  // Indicates the color on alpha channel
+
 		gl.glMatrixMode(GL10.GL_MODELVIEW);  // Select model-view matrix
 		gl.glLoadIdentity();                 // Reset
 	}
@@ -147,15 +177,11 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glLoadIdentity();
 	}
 
-	private float aspect;
-
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
 		// Define the Viewport
 		this.width=width;
 		this.height=height;
-
-		aspect = (float)this.width / this.height;
 
 		gl.glViewport(0, 0, width, height);
 	}

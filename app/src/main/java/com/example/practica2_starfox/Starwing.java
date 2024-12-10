@@ -16,12 +16,12 @@ public class Starwing extends Object3D{
     }
 
     public void setStarY(float y) {
-        // -7 < star_y < 6
-        this.star_y = Math.max(Math.min(y,6f),-7f);
+        // -6 < star_y < 5
+        this.star_y = Math.max(Math.min(y,5f),-6f);
     }
     public void setStarX(float x) {
-        // -3 < star_x < 3
-        this.star_x = Math.max(Math.min(x,3f),-3f);
+        // -13 < star_x < 13
+        this.star_x = Math.max(Math.min(x,13f),-13f);
     }
 
     public void setStarIdle(boolean idle) { this.starship_idle = idle; }
