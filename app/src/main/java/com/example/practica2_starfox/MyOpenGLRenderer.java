@@ -52,6 +52,8 @@ public class MyOpenGLRenderer implements Renderer {
 	private HUDTexture hud_shield;
 	private HUDTexture hud_turbo;
 
+	private WhiteDots dot;
+
 	private Light light;
 
 	private int width;
@@ -114,6 +116,9 @@ public class MyOpenGLRenderer implements Renderer {
 		hud_turbo.setHorizontalOffset(-0.04f);
 		hud_turbo.setVerticalOffset(0.08f);
 		hud_turbo.loadTexture(gl, context,R.raw.hud_turbo);
+
+		dot = new WhiteDots();
+		dot.setColor(gl,1,1,1);
 	}
 
 	@Override
@@ -144,6 +149,14 @@ public class MyOpenGLRenderer implements Renderer {
 		starwing.draw(gl);
 		gl.glPopMatrix();
 
+		for(int i = -3; i < 4; i++) {
+			gl.glPushMatrix();
+			//gl.glTranslatef(i,0,ini_pos+acercamiento)
+			gl.glTranslatef(i,-1,dot.getPosition());
+			gl.glScalef(0.5f,0.5f,1);
+			dot.draw(gl);
+			gl.glPopMatrix();
+		}
 
 		gl.glDisable(GL10.GL_LIGHTING);
 
