@@ -42,4 +42,5 @@ public class Starwing extends Object3D{
     public float getVerticalInclination() {return this.vertical_inclination;}
 
     public float getVerticalHover() { return this.star_y + (float)Math.sin(2*Math.PI*System.nanoTime() / 2000000000.0f) * 0.1f; }
+
 }

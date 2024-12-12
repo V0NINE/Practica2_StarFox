@@ -18,7 +18,7 @@ import android.opengl.GLUtils;
  * Define the vertices for only one representative face.
  * Render the cube by translating and rotating the face.
  */
-public class TextureCube {
+public class Background {
     private FloatBuffer vertexBuffer; // Buffer for vertex-array
     private FloatBuffer texBuffer;    // Buffer for texture-coords-array (NEW)
 
@@ -38,7 +38,7 @@ public class TextureCube {
     int[] textureIDs = new int[1];   // Array for 1 texture-ID (NEW)
 
     // Constructor - Set up the buffers
-    public TextureCube() {
+    public Background() {
         // Setup vertex-array buffer. Vertices in float. An float has 4 bytes
         ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
         vbb.order(ByteOrder.nativeOrder()); // Use native byte order
@@ -70,41 +70,6 @@ public class TextureCube {
 
         // front
         gl.glPushMatrix();
-        gl.glTranslatef(0.0f, 0.0f, 1.0f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-        gl.glPopMatrix();
-
-        // left
-        gl.glPushMatrix();
-        gl.glRotatef(270.0f, 0.0f, 1.0f, 0.0f);
-        gl.glTranslatef(0.0f, 0.0f, 1.0f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-        gl.glPopMatrix();
-
-        // back
-        gl.glPushMatrix();
-        gl.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
-        gl.glTranslatef(0.0f, 0.0f, 1.0f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-        gl.glPopMatrix();
-
-        // right
-        gl.glPushMatrix();
-        gl.glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
-        gl.glTranslatef(0.0f, 0.0f, 1.0f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-        gl.glPopMatrix();
-
-        // top
-        gl.glPushMatrix();
-        gl.glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
-        gl.glTranslatef(0.0f, 0.0f, 1.0f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-        gl.glPopMatrix();
-
-        // bottom
-        gl.glPushMatrix();
-        gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
         gl.glTranslatef(0.0f, 0.0f, 1.0f);
         gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
         gl.glPopMatrix();

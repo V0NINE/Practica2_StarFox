@@ -14,14 +14,16 @@ import java.util.ArrayList;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLUtils;
 
 public class Object3D {
 
 	// Color enabled or not
 	boolean colorEnabled = false;
 
-	// Texture enabled or not
-	boolean textureEnabled = false;
+	private boolean textureEnabled = false;
 
 	// Our vertex buffer.
 	private FloatBuffer vertexBuffer;
@@ -35,9 +37,8 @@ public class Object3D {
 	// Our texture buffer.
 	private FloatBuffer texcoordBuffer;
 
-	int[] textures;
+	int[] textures = new int[1];
 	int numFaceIndexs = 0;
-
 	public Object3D(Context ctx, int filenameId) {
 
 		try {
@@ -146,11 +147,14 @@ public class Object3D {
 	}
 
 	public void draw(GL10 gl) {
+
 		// Enabled the vertices buffer for writing and to be used during
 		// rendering.
 		gl.glColor4f(1,1,1,1);
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		if(textureEnabled) gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		if(textureEnabled) {
+			gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		}
 
 		//////////////////////// NEW ////////////////////////////////
 		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
@@ -178,5 +182,35 @@ public class Object3D {
 		//////////////////////// NEW ////////////////////////////////
 		gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 		//////////////////////// NEW ////////////////////////////////
+	}
+
+	public void loadTexture(GL10 gl, Context context, int resource_id) {
+		gl.glGenTextures(1, textures, 0); // Generate texture-ID array
+
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);   // Bind to texture ID
+		// Set up texture filters
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+
+		// Construct an input stream to texture image "res\drawable\nehe.png"
+		InputStream istream = context.getResources().openRawResource(resource_id);
+
+		Bitmap bitmap;
+		try {
+			// Read and decode input as bitmap
+			bitmap = BitmapFactory.decodeStream(istream);
+		} finally {
+			try {
+				istream.close();
+			} catch(IOException e) { }
+		}
+
+		// Build Texture from loaded bitmap for the currently-bind texture ID
+		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+		bitmap.recycle();
+	}
+
+	public int getTextureID() {
+		return textures[0];
 	}
 }

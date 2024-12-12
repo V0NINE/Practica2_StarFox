@@ -42,17 +42,20 @@ public class MyOpenGLRenderer implements Renderer {
 
 	private final Context context;
 
-	private TextureCube background;
-	private TextureCube mountains;
-	private TextureCube clouds;
+	private Background background;
+	private Background mountains;
+	private Background clouds;
 	private Starwing starwing;
+	private Obstacles obstacles;
 
 	private HUDTexture hud_lives;
 	private HUDTexture lives_count;
 	private HUDTexture hud_shield;
 	private HUDTexture hud_turbo;
+	private HUDTexture hud_camera_button;
+	private HUDTexture hud_camera_button_pressed;
 
-	private WhiteDots dot;
+	private WhiteDots dots;
 
 	private Light light;
 
@@ -62,7 +65,10 @@ public class MyOpenGLRenderer implements Renderer {
 	private int global_frame;
 	private int live_count_frame;
 
+	boolean vigliance_camera = false;
+
 	public int getWidth() {
+		System.out.println("Pip " + width);
 		return width;
 	}
 
@@ -81,13 +87,13 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glEnable(GL10.GL_LIGHTING);
 		gl.glEnable(GL10.GL_NORMALIZE);
 
-		background = new TextureCube();
+		background = new Background();
 		background.loadTexture(gl, context, R.raw.fondo);
 
-		mountains = new TextureCube();
+		mountains = new Background();
 		mountains.loadTexture(gl, context, R.raw.muntanyes);
 
-		clouds = new TextureCube();
+		clouds = new Background();
 		clouds.loadTexture(gl, context, R.raw.nubols);
 
 		light = new Light(gl, GL10.GL_LIGHT0);
@@ -97,6 +103,8 @@ public class MyOpenGLRenderer implements Renderer {
 		light.setDiffuseColor(new float[]{1f, 1f, 1f});
 
 		starwing = new Starwing(context, R.raw.starwing);
+
+		obstacles = new Obstacles(context, R.raw.pillar_daemon);
 
 		hud_lives = new HUDTexture(0.55f, 0.25f);
 		hud_lives.loadTexture(gl, context, R.raw.hud_lives);
@@ -117,21 +125,31 @@ public class MyOpenGLRenderer implements Renderer {
 		hud_turbo.setVerticalOffset(0.08f);
 		hud_turbo.loadTexture(gl, context,R.raw.hud_turbo);
 
-		dot = new WhiteDots();
-		dot.setColor(gl,1,1,1);
+		hud_camera_button = new HUDTexture(0.25f, 0.40f);
+		hud_camera_button.loadTexture(gl, context, R.raw.button);
+
+		hud_camera_button_pressed = new HUDTexture(0.25f,0.4f);
+		hud_camera_button_pressed.loadTexture(gl, context, R.raw.button_pressed);
+
+		dots = new WhiteDots();
+		dots.setColor(gl,1,1,1);
+
 	}
 
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		global_frame++;
 
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 		setPerspectiveProjection(gl);
 
-		GLU.gluLookAt(gl, starwing.getStarX()/6f, -starwing.getStarY()/5, 10,
+		if(vigliance_camera)
+			GLU.gluLookAt(gl,20,10,6,5,0,0,0,1,0);
+		else
+			GLU.gluLookAt(gl, starwing.getStarX()/6f, -starwing.getStarY()/5, 10,
 					      starwing.getStarX()/6f, -starwing.getStarY()/5, 0,
 				          starwing.getLateralInclination()/600, 1f, 0f);
-		//GLU.gluLookAt(gl,20,10,6,5,0,0,0,1,0); maybe vigilance camera mode
 
 		// Starwing block
 		gl.glPushMatrix();
@@ -149,21 +167,16 @@ public class MyOpenGLRenderer implements Renderer {
 		starwing.draw(gl);
 		gl.glPopMatrix();
 
-		for(int i = -3; i < 4; i++) {
-			gl.glPushMatrix();
-			//gl.glTranslatef(i,0,ini_pos+acercamiento)
-			gl.glTranslatef(i,-1,dot.getPosition());
-			gl.glScalef(0.5f,0.5f,1);
-			dot.draw(gl);
-			gl.glPopMatrix();
-		}
+		obstacles.update(gl);
+
+		dots.drawDots(gl);
 
 		gl.glDisable(GL10.GL_LIGHTING);
 
 		// Background block
-		drawBackgroundComponent(gl, background, new float[]{55,22,1}, new float[]{0,0.5f,-26});
-		drawBackgroundComponent(gl, clouds, new float[]{45,5,1}, new float[]{0,0.55f,-22});
-		drawBackgroundComponent(gl, mountains, new float[]{45,25,1}, new float[]{0,0.15f,-15});
+		drawBackgroundComponent(gl, background, new float[]{125,35,1}, new float[]{0,0.5f,-77});
+		drawBackgroundComponent(gl, clouds, new float[]{125,12,1}, new float[]{-0.05f,0.4f,-75});
+		drawBackgroundComponent(gl, mountains, new float[]{95,50,1}, new float[]{0,0.15f,-55});
 		
 
 		// HUD block
@@ -173,16 +186,19 @@ public class MyOpenGLRenderer implements Renderer {
 		drawHUDComponent(gl, lives_count, "top", "left", true);
 		drawHUDComponent(gl, hud_shield, "bottom", "left", true);
 		drawHUDComponent(gl, hud_turbo, "bottom", "right", true);
+		if(vigliance_camera)
+			drawHUDComponent(gl, hud_camera_button_pressed, "top", "right", false);
+		else
+			drawHUDComponent(gl, hud_camera_button, "top", "right",false);
 
 		gl.glEnable(GL10.GL_LIGHTING);
 
 		// Animations sector
-		global_frame++;
 		if (global_frame%3 == 0)
 			animateHUD();
 	}
 
-	private void drawBackgroundComponent(GL10 gl, TextureCube component, float[] scale, float[] translation) {
+	private void drawBackgroundComponent(GL10 gl, Background component, float[] scale, float[] translation) {
 		gl.glPushMatrix();
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, component.getTextureID());
 		gl.glScalef(scale[0],scale[1],scale[2]);
@@ -279,24 +295,17 @@ public class MyOpenGLRenderer implements Renderer {
 		gl.glViewport(0, 0, width, height);
 	}
 
-
 	public Starwing getStarwing() {
 		return this.starwing;
 	}
 
-
-	// This function ensures that an object maintains the same pixel size regardless of the screen size.
-	// Formula: x * (originalScreenSize / newScreenSize)
-	// Where:
-	//   - 'x' is the object's intended size for the original screen resolution.
-	//   - 'originalScreenSize' is the reference screen size.
-	//   - 'newScreenSize' is the current screen size.
-	// The ratio (originalScreenSize / newScreenSize) is the scale factor applied to preserve the size.
 	private void setHUDScales() {
 		hud_lives.setTextureScales();
 		lives_count.setTextureScales();
 		hud_shield.setTextureScales();
 		hud_turbo.setTextureScales();
+		hud_camera_button.setTextureScales();
+		hud_camera_button_pressed.setTextureScales();
 	}
 }
 
